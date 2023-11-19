@@ -1,6 +1,9 @@
+const {username , room} = Qs.parse(location.search,{ignoreQueryPrefix:true});
 const socket = io();
 const form = document.getElementById('chat-form');
 const chatMessageDiv = document.querySelector('.chat-messages');
+
+socket.emit("JoinRoom",{username, room});
 
 socket.on("message", (data) => {
     outputChatMessage(data);
