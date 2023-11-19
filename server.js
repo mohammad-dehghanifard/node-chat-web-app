@@ -13,8 +13,14 @@ app.use(express.static(path.join(__dirname, "public")));
 io.on("connection", (socket) => {
     socket.emit('message',"user join the chat server")
     //broadcast => پیام برای تمام کاربران به حاضر در چت به غیر از کاربر جاری ارسال میشه
-    socket.broadcast.emit('message',"user join the chat server")
+    socket.broadcast.emit('message',"user join the chat server");
+
+    socket.on("ChatMessage", (message) =>{
+        io.emit('message', message);
+    })
 })
+
+
 
 server.listen(9090,() => {
     console.log("Listen on 9090")
