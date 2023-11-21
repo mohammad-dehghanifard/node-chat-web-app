@@ -3,7 +3,7 @@ const socket = require('socket.io');
 const path = require('path');
 const http = require('http');
 const messageHandler = require('./utils/chat_message_handeler');
-const {joinUser,getCurrentUser} = require("./service/user_service");
+const {joinUser,getCurrentUser,leftUser} = require("./service/user_service");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,8 +29,17 @@ io.on("connection", (socket) => {
 
 
     socket.on("ChatMessage", (message) =>{
-        io.emit('message',messageHandler("mohammad",message));
+        const user = getCurrentUser(socket.id);
+        io.to(user.room).emit('message',messageHandler(user.username,message));
     })
+
+    socket.on("disconnect", () => {
+        const user = leftUser(socket.id);
+
+        if(user){
+            io.to(user.room).emit('message',messageHandler(user.username,`${user.username} چت را ترک کرد`))
+        }
+    } )
 })
 
 
