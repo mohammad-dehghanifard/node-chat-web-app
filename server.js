@@ -3,7 +3,7 @@ const socket = require('socket.io');
 const path = require('path');
 const http = require('http');
 const messageHandler = require('./utils/chat_message_handeler');
-const {joinUser,getCurrentUser,leftUser} = require("./service/user_service");
+const {joinUser,getCurrentUser,leftUser,getRoomUsers} = require("./service/user_service");
 
 const app = express();
 const server = http.createServer(app);
@@ -20,13 +20,16 @@ io.on("connection", (socket) => {
         //جدا کردن روم ها از هم
         socket.join(user.room);
         socket.emit('message',messageHandler("mohammad","به چت روم ما خوش آمدید"));
-        socket.broadcast.to(user.room).emit('message',messageHandler("mohammad",`${user.username}  به چت وارد شد`))
-
+        socket.broadcast.to(user.room).emit('message',messageHandler("mohammad",`${user.username}  به چت وارد شد`));
+        
+        // دریافت و نمایش لیست کاربران و نام اتاق
+        io.to(user.room).emit("roomUsers",{
+            room : user.room,
+            users: getRoomUsers(user.room)
+        });
         //broadcast => پیام برای تمام کاربران به حاضر در چت به غیر از کاربر جاری ارسال میشه
         //socket.broadcast.emit('message',"user join the chat server");
     })
-
-
 
     socket.on("ChatMessage", (message) =>{
         const user = getCurrentUser(socket.id);
@@ -39,8 +42,11 @@ io.on("connection", (socket) => {
         if(user){
             io.to(user.room).emit('message',messageHandler(user.username,`${user.username} چت را ترک کرد`))
         }
-    } )
-})
+    } );
+
+    
+    
+});
 
 
 

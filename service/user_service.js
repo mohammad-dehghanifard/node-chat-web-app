@@ -18,6 +18,10 @@ function leftUser(id){
     }
 }
 
+function getRoomUsers(room){
+    return users.filter(user => user.room === room);
+}
+
 module.exports = {
-    joinUser,getCurrentUser,leftUser
+    joinUser,getCurrentUser,leftUser,getRoomUsers
 }
